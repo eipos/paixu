@@ -1,4 +1,4 @@
-name: Portable EXE Release
+name: Build Portable EXE
 
 on:
   push:
@@ -9,9 +9,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: portable-exe-release
+  cancel-in-progress: true
+
 jobs:
-  build-and-release-exe:
+  build-and-release:
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,16 +33,25 @@ jobs:
       - name: Build portable exe
         run: npm run dist:win
 
-      - name: Publish latest release with exe
-        uses: ncipollo/release-action@v1
+      - name: Verify exe exists
+        shell: bash
+        run: test -f release/Tier-List-Pro-Portable.exe
+
+      - name: Upload exe as workflow artifact (debug)
+        uses: actions/upload-artifact@v4
         with:
-          tag: latest
-          name: Latest Build
-          allowUpdates: true
-          removeArtifacts: true
-          makeLatest: true
-          artifactErrorsFailBuild: true
-          artifacts: release/Tier-List-Pro-Portable.exe
-          body: |
-            Auto-updated Windows portable build.
-            File: Tier-List-Pro-Portable.exe
+          name: Tier-List-Pro-Portable
+          path: release/Tier-List-Pro-Portable.exe
+
+      - name: Create or update latest release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $exe = "release/Tier-List-Pro-Portable.exe"
+          gh release view latest --repo $env:GITHUB_REPOSITORY 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create latest $exe --repo $env:GITHUB_REPOSITORY --title "Latest Build" --notes "Auto-updated Windows portable build." --latest
+          } else {
+            gh release upload latest $exe --repo $env:GITHUB_REPOSITORY --clobber
+          }
