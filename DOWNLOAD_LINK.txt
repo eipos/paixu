@@ -1,0 +1,7 @@
+Windows 免安装版（Portable EXE）下载链接模板：
+https://github.com/<owner>/<repo>/releases/latest/download/Tier-List-Pro-Portable.exe
+
+使用方法：
+1) 把 <owner> 替换为 GitHub 用户名或组织名
+2) 把 <repo> 替换为仓库名
+3) 用户直接打开链接下载，下载后双击 exe 即可使用

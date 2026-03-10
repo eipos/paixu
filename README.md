@@ -1,49 +1,49 @@
 # Tier List Pro (Desktop)
 
-这是一个可打包为桌面端的 Tier List 工具，支持导出：
+你只需要做一件事：**下载 exe 后双击就能用（免安装）**。
 
-- Windows 免安装版：`exe`（portable）
-- macOS 拖拽安装版：`dmg`
+## Windows 用户：直接下载并使用
 
-## portable exe 下载链接
+### 1) 打开这个页面
 
-发布后可直接下载（将 `<owner>` / `<repo>` 替换为你的仓库）：
+- `https://github.com/<owner>/<repo>/releases/latest`
+
+### 2) 点击下载这个文件
+
+- `Tier-List-Pro-Portable.exe`
+
+### 3) 双击运行
+
+- 不需要安装，下载后即可直接使用。
+- 如果 Windows 弹出安全提示，点击“更多信息”->“仍要运行”。
+
+---
+
+## 一键直链（可直接发给用户）
+
+把下面链接中的 `<owner>` 和 `<repo>` 换成你的仓库后，就是最终可下载地址：
 
 - `https://github.com/<owner>/<repo>/releases/latest/download/Tier-List-Pro-Portable.exe`
 
-> 说明：该链接依赖固定产物名 `Tier-List-Pro-Portable.exe`，已在 `electron-builder` 中配置。
+> 文件名已经固定为 `Tier-List-Pro-Portable.exe`，所以这个直链会一直可用（每次自动指向最新版本）。
 
-## 本地开发
+---
 
-```bash
-npm install
-npm run dev
-```
+## macOS 下载（可选）
 
-## 打包
+- 文件名：`Tier-List-Pro-macOS.dmg`
+- 地址：`https://github.com/<owner>/<repo>/releases/latest/download/Tier-List-Pro-macOS.dmg`
 
-```bash
-# Windows 便携可执行文件（.exe）
-npm run dist:win
+---
 
-# macOS 磁盘镜像（.dmg）
-npm run dist:mac
+## 给维护者：如何自动生成下载文件
 
-# 同时打包 win + mac
-npm run dist
-```
+仓库已包含自动发布工作流 `.github/workflows/release.yml`。
 
-构建产物默认输出到 `release/` 目录。
+推送版本标签（如 `v1.0.0`）后，会自动构建并上传：
 
-## 自动发布（推荐）
-
-仓库已包含 GitHub Actions 工作流：`.github/workflows/release.yml`。
-
-当你推送 tag（如 `v1.0.0`）后，会自动：
-
-1. 在 Windows runner 构建 `Tier-List-Pro-Portable.exe`
-2. 在 macOS runner 构建 `Tier-List-Pro-macOS.dmg`
-3. 将两个文件上传到对应 GitHub Release
+1. `Tier-List-Pro-Portable.exe`
+2. `Tier-List-Pro-macOS.dmg`
 
 示例：
 
