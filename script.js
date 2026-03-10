@@ -12,6 +12,11 @@ const closeModalBtn = document.getElementById('close-modal');
 const copyWechatBtn = document.getElementById('copy-wechat');
 
 const defaultTiers = [
+const uploadInput = document.getElementById('upload');
+const tierTemplate = document.getElementById('tier-template');
+const assetPool = document.getElementById('asset-pool');
+
+const defaults = [
   ['S', '#ef4444'],
   ['A', '#f97316'],
   ['B', '#eab308'],
@@ -77,6 +82,10 @@ function bindItemDrag(item) {
 function insertAtPointer(container, dragged, pointerX) {
   const siblings = [...container.querySelectorAll('.item:not(.dragging)')];
   const target = siblings.find((el) => pointerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
+function insertAtPointer(container, dragged) {
+  const siblings = [...container.querySelectorAll('.item:not(.dragging):not(.placeholder)')];
+  const centerX = window.event?.clientX ?? 0;
+  const target = siblings.find((el) => centerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
   if (target) container.insertBefore(dragged, target);
   else container.appendChild(dragged);
 }
@@ -87,6 +96,7 @@ function bindDropzone(zone, row) {
     if (!dragData) return;
     row.classList.add('row-over');
     insertAtPointer(zone, dragData.item, e.clientX);
+    insertAtPointer(zone, dragData.item);
   });
 
   zone.addEventListener('dragleave', () => row.classList.remove('row-over'));
@@ -98,6 +108,8 @@ function bindDropzone(zone, row) {
     dragData.item.animate(
       [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
       { duration: 220, easing: 'cubic-bezier(0.2, 0.9, 0.2, 1.1)' }
+      [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0)' }],
+      { duration: 260, easing: 'cubic-bezier(0.2, 0.9, 0.2, 1.1)' }
     );
   });
 }
@@ -106,6 +118,7 @@ function bindRowReorder(row) {
   const handle = row.querySelector('.row-handle');
 
   handle.addEventListener('pointerdown', () => {
+  handle.addEventListener('mousedown', () => {
     row.setAttribute('draggable', 'true');
   });
 
@@ -121,6 +134,13 @@ function bindRowReorder(row) {
     row.removeAttribute('draggable');
     rowDrag = null;
     clearTierHighlight();
+    row.classList.add('dragging-row');
+  });
+
+  row.addEventListener('dragend', () => {
+    row.classList.remove('dragging-row');
+    row.removeAttribute('draggable');
+    rowDrag = null;
   });
 
   row.addEventListener('dragover', (e) => {
@@ -135,6 +155,10 @@ function bindRowReorder(row) {
   });
 
   row.addEventListener('drop', () => clearTierHighlight());
+    const rect = row.getBoundingClientRect();
+    const next = e.clientY > rect.top + rect.height / 2;
+    board.insertBefore(rowDrag, next ? row.nextSibling : row);
+  });
 }
 
 function addImage(src) {
@@ -223,6 +247,7 @@ assetPool.addEventListener('dragover', (e) => {
   e.preventDefault();
   assetPool.classList.add('drop-active');
   if (dragData?.item) insertAtPointer(poolGrid, dragData.item, e.clientX);
+  if (dragData?.item) insertAtPointer(poolGrid, dragData.item);
 });
 
 assetPool.addEventListener('dragleave', () => assetPool.classList.remove('drop-active'));
@@ -256,3 +281,4 @@ document.body.addEventListener('drop', (e) => {
 });
 
 resetToDefault();
+defaults.forEach(([name, color]) => createTier(name, color));
