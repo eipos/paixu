@@ -1,0 +1,226 @@
+:root {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --stroke: #e6e8eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --radius: 12px;
+  --item-size: 92px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top right, #eef6ff 0%, #f8f9fa 40%);
+  color: var(--text);
+}
+
+.app {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  gap: 16px;
+}
+
+h1 {
+  margin: 0;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.btn {
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+}
+
+.btn.primary {
+  background: #111827;
+  color: #fff;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 60vh;
+}
+
+.tier-row {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.tier-row.row-over {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tier-color) 10%, white), #ffffff);
+}
+
+.tier-row.row-dragging {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.tier-row.row-target-top {
+  box-shadow: inset 0 3px 0 #3b82f6;
+}
+
+.tier-row.row-target-bottom {
+  box-shadow: inset 0 -3px 0 #3b82f6;
+}
+
+.tier-label-wrap {
+  background: color-mix(in srgb, var(--tier-color) 24%, white);
+  border-radius: 10px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 24px 1fr 36px 30px;
+  align-items: center;
+  gap: 8px;
+}
+
+.row-handle,
+.delete-tier {
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.delete-tier {
+  cursor: pointer;
+}
+
+.tier-name {
+  border: 0;
+  font-size: 18px;
+  font-weight: 700;
+  background: transparent;
+  width: 100%;
+}
+
+.tier-dropzone,
+.items-grid {
+  min-height: calc(var(--item-size) + 8px);
+  display: flex;
+  gap: 8px;
+  align-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.item {
+  width: var(--item-size);
+  height: var(--item-size);
+  border-radius: var(--radius);
+  object-fit: cover;
+  border: 1px solid var(--stroke);
+  cursor: grab;
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1.1), box-shadow 220ms;
+}
+
+.item.dragging {
+  transform: scale(1.05);
+  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.asset-pool {
+  position: sticky;
+  bottom: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.pool-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.pool-header p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.drop-active {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.author-modal {
+  border: 0;
+  border-radius: 14px;
+  width: min(460px, 92vw);
+  padding: 0;
+}
+
+.author-modal::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  padding: 24px;
+}
+
+.modal-content h3 {
+  margin: 0 0 8px;
+}
+
+.wechat {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.modal-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
