@@ -1,0 +1,54 @@
+{
+  "name": "tier-list-pro",
+  "version": "1.0.0",
+  "description": "Tier List desktop app",
+  "main": "main.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron .",
+    "dist:win": "electron-builder --win portable",
+    "dist:mac": "electron-builder --mac dmg",
+    "dist": "electron-builder --win portable --mac dmg"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.paixu.tierlistpro",
+    "productName": "Tier List Pro",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "styles.css",
+      "script.js"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity"
+    }
+  }
+}
