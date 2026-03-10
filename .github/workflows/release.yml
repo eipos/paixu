@@ -1,4 +1,4 @@
-name: Build and Release
+name: Portable EXE Release
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  build-win:
+  build-and-release-exe:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -28,53 +28,7 @@ jobs:
       - name: Build portable exe
         run: npm run dist:win
 
-      - name: Upload win artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: win-portable
-          path: release/Tier-List-Pro-Portable.exe
-
-  build-mac:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build dmg
-        run: npm run dist:mac
-
-      - name: Upload mac artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mac-dmg
-          path: release/Tier-List-Pro-macOS.dmg
-
-  release:
-    runs-on: ubuntu-latest
-    needs: [build-win, build-mac]
-    steps:
-      - name: Download win artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: win-portable
-          path: release
-
-      - name: Download mac artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: mac-dmg
-          path: release
-
-      - name: Publish latest release assets
+      - name: Publish latest release with exe
         uses: ncipollo/release-action@v1
         with:
           tag: latest
@@ -83,10 +37,7 @@ jobs:
           removeArtifacts: true
           makeLatest: true
           artifactErrorsFailBuild: true
-          artifacts: |
-            release/Tier-List-Pro-Portable.exe
-            release/Tier-List-Pro-macOS.dmg
+          artifacts: release/Tier-List-Pro-Portable.exe
           body: |
-            Auto-updated desktop build.
-            - Windows: Tier-List-Pro-Portable.exe
-            - macOS: Tier-List-Pro-macOS.dmg
+            Auto-updated Windows portable build.
+            File: Tier-List-Pro-Portable.exe

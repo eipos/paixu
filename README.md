@@ -1,47 +1,26 @@
 # Tier List Pro (Desktop)
 
-你只需要点一个链接下载 EXE（免安装）：
+你要的就是这个（Windows 免安装 EXE）：
 
-## ✅ 直接下载 EXE
+## ✅ 直接下载
 
-- https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
+https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
 
-下载后双击 `Tier-List-Pro-Portable.exe` 即可使用。
-
----
-
-## 打开 404 怎么办？
-
-出现 404 通常是这 3 个原因：
-
-1. 仓库是私有仓库（未登录或无权限会 404）
-2. 还没有生成任何 Release（第一次构建未完成）
-3. GitHub Actions 还在构建中（通常几分钟）
-
-请先打开：
-
-- Actions 页面： https://github.com/eipos/paixu/actions
-- Releases 页面： https://github.com/eipos/paixu/releases
-
-只要 Actions 里 `Build and Release` 成功，`releases/latest/download/...exe` 就会可用。
+下载后双击 `Tier-List-Pro-Portable.exe` 直接运行。
 
 ---
 
-## 我已经帮你做好的自动化（你不用手动打 tag）
+## 还是 404 的处理（按顺序）
 
-现在仓库配置为：
-
-- 每次 push 到 `main` 自动构建
-- 自动更新一个 `latest` Release
-- 自动上传：
-  - `Tier-List-Pro-Portable.exe`
-  - `Tier-List-Pro-macOS.dmg`
+1. 先看这里是否在构建/是否失败：
+   - https://github.com/eipos/paixu/actions/workflows/release.yml
+2. 构建成功后，再打开下载链接。
+3. 如果你没登录 GitHub，先登录（私有仓库会 404）。
 
 ---
 
-## Windows 安全提示
+## 已修复的点
 
-如果弹出“Windows 已保护你的电脑”：
-
-1. 点击「更多信息」
-2. 点击「仍要运行」
+- 工作流已经不再使用 `npm ci`。
+- 现在只做 Windows EXE 自动发布（减少失败点，优先保证你能下载 exe）。
+- 每次 push 到 `main` 都会自动更新 `latest` Release。

@@ -1,6 +1,5 @@
-【Windows 免安装 EXE 直链】
+EXE 直链（免安装）：
 https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
 
-如果打开 404：
-1) 先看构建是否成功： https://github.com/eipos/paixu/actions
-2) 再去 Release 页面下载： https://github.com/eipos/paixu/releases
+构建状态（先看这里是否成功）：
+https://github.com/eipos/paixu/actions/workflows/release.yml
