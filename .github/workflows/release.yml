@@ -2,8 +2,9 @@ name: Build and Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -73,9 +74,19 @@ jobs:
           name: mac-dmg
           path: release
 
-      - name: Publish GitHub Release assets
-        uses: softprops/action-gh-release@v2
+      - name: Publish latest release assets
+        uses: ncipollo/release-action@v1
         with:
-          files: |
+          tag: latest
+          name: Latest Build
+          allowUpdates: true
+          removeArtifacts: true
+          makeLatest: true
+          artifactErrorsFailBuild: true
+          artifacts: |
             release/Tier-List-Pro-Portable.exe
             release/Tier-List-Pro-macOS.dmg
+          body: |
+            Auto-updated desktop build.
+            - Windows: Tier-List-Pro-Portable.exe
+            - macOS: Tier-List-Pro-macOS.dmg
