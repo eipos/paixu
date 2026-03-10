@@ -1,0 +1,37 @@
+name: Preview EXE (No Merge Required)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-preview-exe:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout PR/branch code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build portable exe
+        run: npm run dist:win
+
+      - name: Verify exe exists
+        shell: bash
+        run: test -f release/Tier-List-Pro-Portable.exe
+
+      - name: Upload preview exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tier-List-Pro-Portable-preview
+          path: release/Tier-List-Pro-Portable.exe
