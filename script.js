@@ -1,27 +1,22 @@
-function getLastById(id) {
-  const all = document.querySelectorAll(`#${id}`);
-  return all.length ? all[all.length - 1] : null;
-}
-
-function getAllById(id) {
-  return [...document.querySelectorAll(`#${id}`)];
-}
-
-const board = getLastById('board');
-const poolGrid = getLastById('pool-grid');
-const tierTemplate = getLastById('tier-template');
-const assetPool = getLastById('asset-pool');
-const authorModal = getLastById('author-modal');
-const closeModalBtn = getLastById('close-modal');
-const copyWechatBtn = getLastById('copy-wechat');
-
-const addTierBtns = getAllById('add-tier');
-const reorderTiersBtns = getAllById('reorder-tiers');
-const resetBoardBtns = getAllById('reset-board');
-const contactAuthorBtns = getAllById('contact-author');
-const uploadInputs = getAllById('upload');
+const board = document.getElementById('board');
+const poolGrid = document.getElementById('pool-grid');
+const addTierBtn = document.getElementById('add-tier');
+const reorderTiersBtn = document.getElementById('reorder-tiers');
+const resetBoardBtn = document.getElementById('reset-board');
+const contactAuthorBtn = document.getElementById('contact-author');
+const uploadInput = document.getElementById('upload');
+const tierTemplate = document.getElementById('tier-template');
+const assetPool = document.getElementById('asset-pool');
+const authorModal = document.getElementById('author-modal');
+const closeModalBtn = document.getElementById('close-modal');
+const copyWechatBtn = document.getElementById('copy-wechat');
 
 const defaultTiers = [
+const uploadInput = document.getElementById('upload');
+const tierTemplate = document.getElementById('tier-template');
+const assetPool = document.getElementById('asset-pool');
+
+const defaults = [
   ['S', '#ef4444'],
   ['A', '#f97316'],
   ['B', '#eab308'],
@@ -33,22 +28,18 @@ let dragData = null;
 let rowDrag = null;
 
 function clearTierHighlight() {
-  if (!board) return;
   [...board.querySelectorAll('.tier-row')].forEach((row) => {
     row.classList.remove('row-target-top', 'row-target-bottom', 'row-over');
   });
 }
 
 function createTier(name, color) {
-  if (!board || !tierTemplate?.content?.firstElementChild) return;
-
   const node = tierTemplate.content.firstElementChild.cloneNode(true);
   const nameInput = node.querySelector('.tier-name');
   const colorInput = node.querySelector('.tier-color');
   const deleteBtn = node.querySelector('.delete-tier');
   const dropzone = node.querySelector('.tier-dropzone');
 
-  node.removeAttribute('draggable');
   nameInput.value = name;
   colorInput.value = color;
   node.style.setProperty('--tier-color', color);
@@ -91,6 +82,10 @@ function bindItemDrag(item) {
 function insertAtPointer(container, dragged, pointerX) {
   const siblings = [...container.querySelectorAll('.item:not(.dragging)')];
   const target = siblings.find((el) => pointerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
+function insertAtPointer(container, dragged) {
+  const siblings = [...container.querySelectorAll('.item:not(.dragging):not(.placeholder)')];
+  const centerX = window.event?.clientX ?? 0;
+  const target = siblings.find((el) => centerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
   if (target) container.insertBefore(dragged, target);
   else container.appendChild(dragged);
 }
@@ -101,6 +96,7 @@ function bindDropzone(zone, row) {
     if (!dragData) return;
     row.classList.add('row-over');
     insertAtPointer(zone, dragData.item, e.clientX);
+    insertAtPointer(zone, dragData.item);
   });
 
   zone.addEventListener('dragleave', () => row.classList.remove('row-over'));
@@ -112,6 +108,8 @@ function bindDropzone(zone, row) {
     dragData.item.animate(
       [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
       { duration: 220, easing: 'cubic-bezier(0.2, 0.9, 0.2, 1.1)' }
+      [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0)' }],
+      { duration: 260, easing: 'cubic-bezier(0.2, 0.9, 0.2, 1.1)' }
     );
   });
 }
@@ -120,6 +118,7 @@ function bindRowReorder(row) {
   const handle = row.querySelector('.row-handle');
 
   handle.addEventListener('pointerdown', () => {
+  handle.addEventListener('mousedown', () => {
     row.setAttribute('draggable', 'true');
   });
 
@@ -135,6 +134,13 @@ function bindRowReorder(row) {
     row.removeAttribute('draggable');
     rowDrag = null;
     clearTierHighlight();
+    row.classList.add('dragging-row');
+  });
+
+  row.addEventListener('dragend', () => {
+    row.classList.remove('dragging-row');
+    row.removeAttribute('draggable');
+    rowDrag = null;
   });
 
   row.addEventListener('dragover', (e) => {
@@ -149,10 +155,13 @@ function bindRowReorder(row) {
   });
 
   row.addEventListener('drop', () => clearTierHighlight());
+    const rect = row.getBoundingClientRect();
+    const next = e.clientY > rect.top + rect.height / 2;
+    board.insertBefore(rowDrag, next ? row.nextSibling : row);
+  });
 }
 
 function addImage(src) {
-  if (!poolGrid) return;
   const img = new Image();
   img.src = src;
   img.className = 'item';
@@ -172,14 +181,12 @@ function readFiles(files) {
 }
 
 function resetToDefault() {
-  if (!board || !poolGrid) return;
   board.innerHTML = '';
   poolGrid.innerHTML = '';
   defaultTiers.forEach(([name, color]) => createTier(name, color));
 }
 
 function shuffleTiers() {
-  if (!board) return;
   const tiers = [...board.children];
   for (let i = tiers.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -187,6 +194,7 @@ function shuffleTiers() {
   }
 
   tiers.forEach((tier, index) => {
+    tier.style.transform = 'translateY(-6px)';
     board.appendChild(tier);
     tier.animate(
       [
@@ -195,97 +203,82 @@ function shuffleTiers() {
       ],
       { duration: 260 + index * 12, easing: 'ease-out' }
     );
+    setTimeout(() => {
+      tier.style.transform = '';
+    }, 300);
   });
 }
 
-function init() {
-  if (!board || !poolGrid || !tierTemplate || !assetPool) {
-    console.warn('Tier List init skipped: required DOM missing.');
-    return;
+addTierBtn.addEventListener('click', () => {
+  createTier(`Tier ${board.children.length + 1}`, '#a855f7');
+});
+
+reorderTiersBtn.addEventListener('click', shuffleTiers);
+
+resetBoardBtn.addEventListener('click', () => {
+  const confirmed = window.confirm('确认恢复到初始状态？这会清空当前图片和自定义等级。');
+  if (confirmed) resetToDefault();
+});
+
+contactAuthorBtn.addEventListener('click', () => {
+  if (authorModal.showModal) authorModal.showModal();
+});
+
+closeModalBtn.addEventListener('click', () => authorModal.close());
+authorModal.addEventListener('click', (e) => {
+  if (e.target === authorModal) authorModal.close();
+});
+
+copyWechatBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText('cvsooo');
+    copyWechatBtn.textContent = '已复制';
+    setTimeout(() => {
+      copyWechatBtn.textContent = '复制微信号';
+    }, 1200);
+  } catch {
+    alert('微信号：cvsooo');
   }
+});
 
-  addTierBtns.forEach((btn) => {
-    btn.addEventListener('click', () => createTier(`Tier ${board.children.length + 1}`, '#a855f7'));
-  });
+uploadInput.addEventListener('change', (e) => readFiles(e.target.files));
 
-  reorderTiersBtns.forEach((btn) => btn.addEventListener('click', shuffleTiers));
+assetPool.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  assetPool.classList.add('drop-active');
+  if (dragData?.item) insertAtPointer(poolGrid, dragData.item, e.clientX);
+  if (dragData?.item) insertAtPointer(poolGrid, dragData.item);
+});
 
-  resetBoardBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const confirmed = window.confirm('确认恢复到初始状态？这会清空当前图片和自定义等级。');
-      if (confirmed) resetToDefault();
-    });
-  });
+assetPool.addEventListener('dragleave', () => assetPool.classList.remove('drop-active'));
+assetPool.addEventListener('drop', (e) => {
+  e.preventDefault();
+  assetPool.classList.remove('drop-active');
+  if (e.dataTransfer.files.length) readFiles(e.dataTransfer.files);
+  if (dragData?.item) {
+    dragData.item.animate(
+      [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
+      { duration: 180, easing: 'ease-out' }
+    );
+  }
+});
 
-  contactAuthorBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (authorModal?.showModal) authorModal.showModal();
-    });
-  });
-
-  closeModalBtn?.addEventListener('click', () => authorModal?.close());
-  authorModal?.addEventListener('click', (e) => {
-    if (e.target === authorModal) authorModal.close();
-  });
-
-  copyWechatBtn?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText('cvsooo');
-      copyWechatBtn.textContent = '已复制';
-      setTimeout(() => {
-        copyWechatBtn.textContent = '复制微信号';
-      }, 1200);
-    } catch {
-      alert('微信号：cvsooo');
-    }
-  });
-
-  uploadInputs.forEach((input) => {
-    input.addEventListener('change', (e) => readFiles(e.target.files));
-  });
-
-  assetPool.addEventListener('dragover', (e) => {
+document.body.addEventListener('drop', (e) => {
+  const valid = e.target.closest('.tier-dropzone, #asset-pool');
+  if (!valid && dragData?.item) {
     e.preventDefault();
-    assetPool.classList.add('drop-active');
-    if (dragData?.item) insertAtPointer(poolGrid, dragData.item, e.clientX);
-  });
+    dragData.source.appendChild(dragData.item);
+    dragData.item.animate(
+      [
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-5px)' },
+        { transform: 'translateX(5px)' },
+        { transform: 'translateX(0)' }
+      ],
+      { duration: 220, easing: 'ease-out' }
+    );
+  }
+});
 
-  assetPool.addEventListener('dragleave', () => assetPool.classList.remove('drop-active'));
-  assetPool.addEventListener('drop', (e) => {
-    e.preventDefault();
-    assetPool.classList.remove('drop-active');
-    if (e.dataTransfer.files.length) readFiles(e.dataTransfer.files);
-    if (dragData?.item) {
-      dragData.item.animate(
-        [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
-        { duration: 180, easing: 'ease-out' }
-      );
-    }
-  });
-
-  document.body.addEventListener('dragover', (e) => e.preventDefault());
-  document.body.addEventListener('drop', (e) => {
-    const valid = e.target.closest('.tier-dropzone, #asset-pool');
-    if (!valid && dragData?.item) {
-      e.preventDefault();
-      dragData.source.appendChild(dragData.item);
-      dragData.item.animate(
-        [
-          { transform: 'translateX(0)' },
-          { transform: 'translateX(-5px)' },
-          { transform: 'translateX(5px)' },
-          { transform: 'translateX(0)' }
-        ],
-        { duration: 220, easing: 'ease-out' }
-      );
-    }
-
-    if (!valid && e.dataTransfer?.files?.length) {
-      readFiles(e.dataTransfer.files);
-    }
-  });
-
-  resetToDefault();
-}
-
-init();
+resetToDefault();
+defaults.forEach(([name, color]) => createTier(name, color));

@@ -41,42 +41,18 @@ Tier List Pro is a visual-first desktop tier-list app focused on smooth drag-and
 If you see 404, check build status first:
 
 - https://github.com/eipos/paixu/actions/workflows/release.yml
+# Tier List Pro (Desktop)
 
+你只需要这个 EXE 下载链接（免安装）：
 
-## Merge conflict tip
+- https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
 
-If GitHub shows conflicts, follow `MERGE_CONFLICT_GUIDE.md` and avoid choosing "accept both" for code files.
+如果还是 404，请按这个顺序看：
 
+1. 打开构建页面：
+   - https://github.com/eipos/paixu/actions/workflows/release.yml
+2. 等待 `Build Portable EXE` 变成绿色成功。
+3. 再点 EXE 链接下载。
+4. 若仓库是私有的，请先登录 GitHub。
 
-## 不合并也能直接拿到 EXE（推荐你现在就用）
-
-可以，不解决冲突也能先生成 EXE：
-
-1. 打开：`Actions` -> `Preview EXE (No Merge Required)`
-2. 在你的 PR 分支上运行（或等 PR 自动触发）
-3. 运行成功后，进入该次 workflow 的 `Artifacts`
-4. 下载 `Tier-List-Pro-Portable-preview`，里面就是 `Tier-List-Pro-Portable.exe`
-
-链接：
-- https://github.com/eipos/paixu/actions/workflows/preview-exe.yml
-
-## 你截图这种冲突怎么点（script.js）
-
-你截图里的 `script.js` 冲突块，请统一选：
-
-- **Accept incoming change**（也就是 `main`）
-
-不要点 `Accept both changes`，会把重复/冲突逻辑拼在一起，最容易导致“按钮失效、拖拽失效”。
-
-
-## 冲突按钮怎么选（GitHub 页面）
-
-- **Current change**：你当前分支（PR 分支）版本
-- **Incoming change**：目标分支（通常是 `main`）版本
-- **Accept both**：两个都保留（本项目代码文件不建议）
-
-对于 `script.js / index.html / styles.css / package.json / workflow`：
-
-- 优先选 **Accept incoming change**
-- 然后再手动补你要的改动
-- 不要选 `Accept both changes`
+> 现在只保留一个 EXE 工作流，避免多个流程互相干扰。

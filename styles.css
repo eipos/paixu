@@ -16,11 +16,13 @@ body {
   margin: 0;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: radial-gradient(circle at top right, #eef6ff 0%, #f8f9fa 40%);
+  background: var(--bg);
   color: var(--text);
 }
 
 .app {
   max-width: 1320px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 24px;
   display: grid;
@@ -107,6 +109,11 @@ h1 {
 
 .tier-row.row-target-bottom {
   box-shadow: inset 0 -3px 0 #3b82f6;
+  transition: background-color 180ms ease;
+}
+
+.tier-row.row-over {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tier-color) 9%, white), #ffffff);
 }
 
 .tier-label-wrap {
@@ -163,6 +170,11 @@ h1 {
   transform: scale(1.05);
   box-shadow: 0 14px 22px rgba(0, 0, 0, 0.2);
   z-index: 100;
+}
+
+.item.placeholder {
+  border: 2px dashed #9ca3af;
+  background: rgba(156, 163, 175, 0.12);
 }
 
 .asset-pool {
