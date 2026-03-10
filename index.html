@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tier List Pro</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <h1>Tier List Pro</h1>
+        <div class="toolbar">
+          <button id="add-tier" class="btn">+ 新增等级</button>
+          <label for="upload" class="btn primary">上传图片</label>
+          <input id="upload" type="file" accept="image/*" multiple hidden />
+        </div>
+      </header>
+
+      <section id="board" class="board"></section>
+
+      <section id="asset-pool" class="asset-pool">
+        <div class="pool-header">
+          <h2>素材库</h2>
+          <p>支持点击上传或拖拽本地图片到此区域</p>
+        </div>
+        <div id="pool-grid" class="items-grid"></div>
+      </section>
+    </main>
+
+    <template id="tier-template">
+      <article class="tier-row" draggable="true">
+        <div class="tier-label-wrap">
+          <button class="row-handle" title="拖拽排序">⋮⋮</button>
+          <input class="tier-name" />
+          <input class="tier-color" type="color" />
+          <button class="delete-tier" title="删除">✕</button>
+        </div>
+        <div class="tier-dropzone"></div>
+      </article>
+    </template>
+
+    <script src="script.js"></script>
+  </body>
+</html>
