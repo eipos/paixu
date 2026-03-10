@@ -1,6 +1,17 @@
 const board = document.getElementById('board');
 const poolGrid = document.getElementById('pool-grid');
 const addTierBtn = document.getElementById('add-tier');
+const reorderTiersBtn = document.getElementById('reorder-tiers');
+const resetBoardBtn = document.getElementById('reset-board');
+const contactAuthorBtn = document.getElementById('contact-author');
+const uploadInput = document.getElementById('upload');
+const tierTemplate = document.getElementById('tier-template');
+const assetPool = document.getElementById('asset-pool');
+const authorModal = document.getElementById('author-modal');
+const closeModalBtn = document.getElementById('close-modal');
+const copyWechatBtn = document.getElementById('copy-wechat');
+
+const defaultTiers = [
 const uploadInput = document.getElementById('upload');
 const tierTemplate = document.getElementById('tier-template');
 const assetPool = document.getElementById('asset-pool');
@@ -15,6 +26,12 @@ const defaults = [
 
 let dragData = null;
 let rowDrag = null;
+
+function clearTierHighlight() {
+  [...board.querySelectorAll('.tier-row')].forEach((row) => {
+    row.classList.remove('row-target-top', 'row-target-bottom', 'row-over');
+  });
+}
 
 function createTier(name, color) {
   const node = tierTemplate.content.firstElementChild.cloneNode(true);
@@ -62,6 +79,9 @@ function bindItemDrag(item) {
   });
 }
 
+function insertAtPointer(container, dragged, pointerX) {
+  const siblings = [...container.querySelectorAll('.item:not(.dragging)')];
+  const target = siblings.find((el) => pointerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
 function insertAtPointer(container, dragged) {
   const siblings = [...container.querySelectorAll('.item:not(.dragging):not(.placeholder)')];
   const centerX = window.event?.clientX ?? 0;
@@ -75,6 +95,7 @@ function bindDropzone(zone, row) {
     e.preventDefault();
     if (!dragData) return;
     row.classList.add('row-over');
+    insertAtPointer(zone, dragData.item, e.clientX);
     insertAtPointer(zone, dragData.item);
   });
 
@@ -85,6 +106,8 @@ function bindDropzone(zone, row) {
     row.classList.remove('row-over');
     if (!dragData) return;
     dragData.item.animate(
+      [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
+      { duration: 220, easing: 'cubic-bezier(0.2, 0.9, 0.2, 1.1)' }
       [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0)' }],
       { duration: 260, easing: 'cubic-bezier(0.2, 0.9, 0.2, 1.1)' }
     );
@@ -93,6 +116,8 @@ function bindDropzone(zone, row) {
 
 function bindRowReorder(row) {
   const handle = row.querySelector('.row-handle');
+
+  handle.addEventListener('pointerdown', () => {
   handle.addEventListener('mousedown', () => {
     row.setAttribute('draggable', 'true');
   });
@@ -100,6 +125,15 @@ function bindRowReorder(row) {
   row.addEventListener('dragstart', (e) => {
     if (e.target !== row) return;
     rowDrag = row;
+    row.classList.add('row-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  row.addEventListener('dragend', () => {
+    row.classList.remove('row-dragging');
+    row.removeAttribute('draggable');
+    rowDrag = null;
+    clearTierHighlight();
     row.classList.add('dragging-row');
   });
 
@@ -112,6 +146,15 @@ function bindRowReorder(row) {
   row.addEventListener('dragover', (e) => {
     if (!rowDrag || rowDrag === row) return;
     e.preventDefault();
+    clearTierHighlight();
+
+    const rect = row.getBoundingClientRect();
+    const insertAfter = e.clientY > rect.top + rect.height / 2;
+    row.classList.add(insertAfter ? 'row-target-bottom' : 'row-target-top');
+    board.insertBefore(rowDrag, insertAfter ? row.nextSibling : row);
+  });
+
+  row.addEventListener('drop', () => clearTierHighlight());
     const rect = row.getBoundingClientRect();
     const next = e.clientY > rect.top + rect.height / 2;
     board.insertBefore(rowDrag, next ? row.nextSibling : row);
@@ -137,8 +180,65 @@ function readFiles(files) {
     });
 }
 
+function resetToDefault() {
+  board.innerHTML = '';
+  poolGrid.innerHTML = '';
+  defaultTiers.forEach(([name, color]) => createTier(name, color));
+}
+
+function shuffleTiers() {
+  const tiers = [...board.children];
+  for (let i = tiers.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [tiers[i], tiers[j]] = [tiers[j], tiers[i]];
+  }
+
+  tiers.forEach((tier, index) => {
+    tier.style.transform = 'translateY(-6px)';
+    board.appendChild(tier);
+    tier.animate(
+      [
+        { transform: 'translateY(-6px)', opacity: 0.8 },
+        { transform: 'translateY(0)', opacity: 1 }
+      ],
+      { duration: 260 + index * 12, easing: 'ease-out' }
+    );
+    setTimeout(() => {
+      tier.style.transform = '';
+    }, 300);
+  });
+}
+
 addTierBtn.addEventListener('click', () => {
   createTier(`Tier ${board.children.length + 1}`, '#a855f7');
+});
+
+reorderTiersBtn.addEventListener('click', shuffleTiers);
+
+resetBoardBtn.addEventListener('click', () => {
+  const confirmed = window.confirm('确认恢复到初始状态？这会清空当前图片和自定义等级。');
+  if (confirmed) resetToDefault();
+});
+
+contactAuthorBtn.addEventListener('click', () => {
+  if (authorModal.showModal) authorModal.showModal();
+});
+
+closeModalBtn.addEventListener('click', () => authorModal.close());
+authorModal.addEventListener('click', (e) => {
+  if (e.target === authorModal) authorModal.close();
+});
+
+copyWechatBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText('cvsooo');
+    copyWechatBtn.textContent = '已复制';
+    setTimeout(() => {
+      copyWechatBtn.textContent = '复制微信号';
+    }, 1200);
+  } catch {
+    alert('微信号：cvsooo');
+  }
 });
 
 uploadInput.addEventListener('change', (e) => readFiles(e.target.files));
@@ -146,6 +246,7 @@ uploadInput.addEventListener('change', (e) => readFiles(e.target.files));
 assetPool.addEventListener('dragover', (e) => {
   e.preventDefault();
   assetPool.classList.add('drop-active');
+  if (dragData?.item) insertAtPointer(poolGrid, dragData.item, e.clientX);
   if (dragData?.item) insertAtPointer(poolGrid, dragData.item);
 });
 
@@ -179,4 +280,5 @@ document.body.addEventListener('drop', (e) => {
   }
 });
 
+resetToDefault();
 defaults.forEach(([name, color]) => createTier(name, color));

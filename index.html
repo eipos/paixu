@@ -9,6 +9,15 @@
   <body>
     <main class="app">
       <header class="topbar">
+        <div>
+          <h1>Tier List Pro</h1>
+          <p class="subtitle">高级层级划分工具 · Smooth, tactile and visual-first.</p>
+        </div>
+        <div class="toolbar">
+          <button id="add-tier" class="btn">+ 新增等级</button>
+          <button id="reorder-tiers" class="btn">一键重排</button>
+          <button id="reset-board" class="btn">重置</button>
+          <button id="contact-author" class="btn">联系作者</button>
         <h1>Tier List Pro</h1>
         <div class="toolbar">
           <button id="add-tier" class="btn">+ 新增等级</button>
@@ -27,6 +36,18 @@
         <div id="pool-grid" class="items-grid"></div>
       </section>
     </main>
+
+    <dialog id="author-modal" class="author-modal">
+      <div class="modal-content">
+        <h3>请作者喝杯奶茶 🧋</h3>
+        <p>感谢支持！可通过微信联系作者：</p>
+        <p class="wechat">微信号：<strong>cvsooo</strong></p>
+        <div class="modal-actions">
+          <button id="copy-wechat" class="btn">复制微信号</button>
+          <button id="close-modal" class="btn primary">我知道了</button>
+        </div>
+      </div>
+    </dialog>
 
     <template id="tier-template">
       <article class="tier-row" draggable="true">

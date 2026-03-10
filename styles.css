@@ -15,11 +15,13 @@
 body {
   margin: 0;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at top right, #eef6ff 0%, #f8f9fa 40%);
   background: var(--bg);
   color: var(--text);
 }
 
 .app {
+  max-width: 1320px;
   max-width: 1300px;
   margin: 0 auto;
   padding: 24px;
@@ -29,15 +31,28 @@ body {
   gap: 16px;
 }
 
+h1 {
+  margin: 0;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .toolbar {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .btn {
@@ -47,6 +62,12 @@ body {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
 }
 
 .btn.primary {
@@ -70,6 +91,24 @@ body {
   border-radius: 14px;
   padding: 12px;
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.tier-row.row-over {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tier-color) 10%, white), #ffffff);
+}
+
+.tier-row.row-dragging {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.tier-row.row-target-top {
+  box-shadow: inset 0 3px 0 #3b82f6;
+}
+
+.tier-row.row-target-bottom {
+  box-shadow: inset 0 -3px 0 #3b82f6;
   transition: background-color 180ms ease;
 }
 
@@ -163,4 +202,37 @@ body {
 .drop-active {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+}
+
+.author-modal {
+  border: 0;
+  border-radius: 14px;
+  width: min(460px, 92vw);
+  padding: 0;
+}
+
+.author-modal::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  padding: 24px;
+}
+
+.modal-content h3 {
+  margin: 0 0 8px;
+}
+
+.wechat {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.modal-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
