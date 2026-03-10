@@ -1,5 +1,6 @@
 EXE 直链（免安装）：
 https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
 
-构建状态（先看这里是否成功）：
+如果 404，先看构建状态：
 https://github.com/eipos/paixu/actions/workflows/release.yml
+https://github.com/eipos/paixu/actions/workflows/npm-publish.yml
