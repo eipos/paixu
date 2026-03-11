@@ -15,7 +15,7 @@
 body {
   margin: 0;
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at top right, #eef6ff 0%, #f8f9fa 40%);
+  background: radial-gradient(circle at top right, #eaf4ff 0%, #f8f9fa 38%);
   color: var(--text);
 }
 
@@ -82,7 +82,7 @@ h1 {
 
 .tier-row {
   display: grid;
-  grid-template-columns: 210px 1fr;
+  grid-template-columns: 230px 1fr;
   gap: 12px;
   background: var(--surface);
   border: 1px solid var(--stroke);
@@ -97,7 +97,8 @@ h1 {
 }
 
 .tier-row.row-dragging {
-  opacity: 0.5;
+  opacity: 0.45;
+  transform: scale(0.99);
   box-shadow: none;
 }
 
@@ -110,11 +111,11 @@ h1 {
 }
 
 .tier-label-wrap {
-  background: color-mix(in srgb, var(--tier-color) 24%, white);
+  background: color-mix(in srgb, var(--tier-color) 20%, white);
   border-radius: 10px;
   padding: 10px;
   display: grid;
-  grid-template-columns: 24px 1fr 30px;
+  grid-template-columns: 24px 1fr 42px 30px;
   align-items: center;
   gap: 8px;
 }
@@ -128,6 +129,10 @@ h1 {
   color: var(--muted);
 }
 
+.row-handle.dragging {
+  color: #2563eb;
+}
+
 .delete-tier {
   cursor: pointer;
 }
@@ -138,6 +143,14 @@ h1 {
   font-weight: 700;
   background: transparent;
   width: 100%;
+}
+
+.tier-color {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .tier-dropzone,
@@ -179,7 +192,17 @@ h1 {
 .pool-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  gap: 10px;
+}
+
+.pool-name {
+  border: 0;
+  background: transparent;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  width: 180px;
 }
 
 .pool-header p {
@@ -223,9 +246,4 @@ h1 {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-}
-
-
-.tier-color {
-  display: none;
 }

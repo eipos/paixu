@@ -1,25 +1,15 @@
-function getLastById(id) {
-  const all = document.querySelectorAll(`#${id}`);
-  return all.length ? all[all.length - 1] : null;
-}
-
-function getAllById(id) {
-  return [...document.querySelectorAll(`#${id}`)];
-}
-
-const board = getLastById('board');
-const poolGrid = getLastById('pool-grid');
-const tierTemplate = getLastById('tier-template');
-const assetPool = getLastById('asset-pool');
-const authorModal = getLastById('author-modal');
-const closeModalBtn = getLastById('close-modal');
-const copyWechatBtn = getLastById('copy-wechat');
-
-const addTierBtns = getAllById('add-tier');
-const reorderTiersBtns = getAllById('reorder-tiers');
-const resetBoardBtns = getAllById('reset-board');
-const contactAuthorBtns = getAllById('contact-author');
-const uploadInputs = getAllById('upload');
+const board = document.getElementById('board');
+const poolGrid = document.getElementById('pool-grid');
+const tierTemplate = document.getElementById('tier-template');
+const assetPool = document.getElementById('asset-pool');
+const addTierBtn = document.getElementById('add-tier');
+const reorderBtn = document.getElementById('reorder-tiers');
+const resetBtn = document.getElementById('reset-board');
+const contactBtn = document.getElementById('contact-author');
+const uploadInput = document.getElementById('upload');
+const authorModal = document.getElementById('author-modal');
+const closeModalBtn = document.getElementById('close-modal');
+const copyWechatBtn = document.getElementById('copy-wechat');
 
 const defaultTiers = [
   ['S', '#ef4444'],
@@ -32,65 +22,39 @@ const defaultTiers = [
 let dragData = null;
 let rowDrag = null;
 
-function clearTierHighlight() {
-  if (!board) return;
+function clearRowState() {
   [...board.querySelectorAll('.tier-row')].forEach((row) => {
-    row.classList.remove('row-target-top', 'row-target-bottom', 'row-over');
+    row.classList.remove('row-target-top', 'row-target-bottom', 'row-over', 'row-dragging');
+    const handle = row.querySelector('.row-handle');
+    if (handle) handle.classList.remove('dragging');
   });
 }
 
-function createTier(name, color) {
-  if (!board || !tierTemplate?.content?.firstElementChild) return;
-
-  const node = tierTemplate.content.firstElementChild.cloneNode(true);
-  const nameInput = node.querySelector('.tier-name');
-  const colorInput = node.querySelector('.tier-color');
-  const deleteBtn = node.querySelector('.delete-tier');
-  const dropzone = node.querySelector('.tier-dropzone');
-
-  node.removeAttribute('draggable');
-  nameInput.value = name;
-  colorInput.value = color;
-  node.style.setProperty('--tier-color', color);
-
-  colorInput.addEventListener('input', () => {
-    node.style.setProperty('--tier-color', colorInput.value);
-  });
-
-  deleteBtn.addEventListener('click', () => {
-    if (board.children.length > 1) node.remove();
-  });
-
-  bindDropzone(dropzone, node);
-  bindRowReorder(node);
-  board.appendChild(node);
-}
-
-function bindItemDrag(item) {
-  item.draggable = true;
-  item.addEventListener('dragstart', (e) => {
-    dragData = { item, source: item.parentElement };
-    item.classList.add('dragging');
+function bindItemDrag(img) {
+  img.draggable = true;
+  img.addEventListener('dragstart', (e) => {
+    dragData = { item: img, source: img.parentElement };
+    img.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', item.dataset.id);
+    e.dataTransfer.setData('text/plain', img.dataset.id);
   });
 
-  item.addEventListener('dragend', () => {
-    item.classList.remove('dragging');
-    item.style.transform = '';
+  img.addEventListener('dragend', () => {
+    img.classList.remove('dragging');
+    img.style.transform = '';
     dragData = null;
   });
 
-  item.addEventListener('drag', () => {
+  img.addEventListener('drag', () => {
     if (!dragData) return;
-    const x = (Math.random() - 0.5) * 4;
-    item.style.transform = `scale(1.05) rotate(${x}deg)`;
+    const angle = (Math.random() - 0.5) * 4;
+    img.style.transform = `scale(1.05) rotate(${angle}deg)`;
   });
 }
 
 function insertAtPointer(container, dragged, pointerX) {
-  const siblings = [...container.querySelectorAll('.item:not(.dragging)')];
-  const target = siblings.find((el) => pointerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
+  const items = [...container.querySelectorAll('.item:not(.dragging)')];
+  const target = items.find((el) => pointerX < el.getBoundingClientRect().left + el.offsetWidth / 2);
   if (target) container.insertBefore(dragged, target);
   else container.appendChild(dragged);
 }
@@ -118,41 +82,63 @@ function bindDropzone(zone, row) {
 
 function bindRowReorder(row) {
   const handle = row.querySelector('.row-handle');
+  handle.draggable = true;
 
-  handle.addEventListener('pointerdown', () => {
-    row.setAttribute('draggable', 'true');
-  });
-
-  row.addEventListener('dragstart', (e) => {
-    if (e.target !== row) return;
+  handle.addEventListener('dragstart', (e) => {
     rowDrag = row;
     row.classList.add('row-dragging');
+    handle.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', 'tier-row');
   });
 
-  row.addEventListener('dragend', () => {
-    row.classList.remove('row-dragging');
-    row.removeAttribute('draggable');
+  handle.addEventListener('dragend', () => {
     rowDrag = null;
-    clearTierHighlight();
+    clearRowState();
   });
 
   row.addEventListener('dragover', (e) => {
     if (!rowDrag || rowDrag === row) return;
     e.preventDefault();
-    clearTierHighlight();
-
+    clearRowState();
     const rect = row.getBoundingClientRect();
     const insertAfter = e.clientY > rect.top + rect.height / 2;
     row.classList.add(insertAfter ? 'row-target-bottom' : 'row-target-top');
     board.insertBefore(rowDrag, insertAfter ? row.nextSibling : row);
   });
 
-  row.addEventListener('drop', () => clearTierHighlight());
+  row.addEventListener('drop', (e) => {
+    if (!rowDrag) return;
+    e.preventDefault();
+    clearRowState();
+  });
+}
+
+function createTier(name, color) {
+  const row = tierTemplate.content.firstElementChild.cloneNode(true);
+  const nameInput = row.querySelector('.tier-name');
+  const colorInput = row.querySelector('.tier-color');
+  const deleteBtn = row.querySelector('.delete-tier');
+  const zone = row.querySelector('.tier-dropzone');
+
+  nameInput.value = name;
+  colorInput.value = color;
+  row.style.setProperty('--tier-color', color);
+
+  colorInput.addEventListener('input', () => {
+    row.style.setProperty('--tier-color', colorInput.value);
+  });
+
+  deleteBtn.addEventListener('click', () => {
+    if (board.children.length > 1) row.remove();
+  });
+
+  bindDropzone(zone, row);
+  bindRowReorder(row);
+  board.appendChild(row);
 }
 
 function addImage(src) {
-  if (!poolGrid) return;
   const img = new Image();
   img.src = src;
   img.className = 'item';
@@ -163,7 +149,7 @@ function addImage(src) {
 
 function readFiles(files) {
   [...files]
-    .filter((file) => file.type.startsWith('image/'))
+    .filter((f) => f.type.startsWith('image/'))
     .forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => addImage(e.target.result);
@@ -171,121 +157,107 @@ function readFiles(files) {
     });
 }
 
-function resetToDefault() {
-  if (!board || !poolGrid) return;
+function resetBoard() {
   board.innerHTML = '';
   poolGrid.innerHTML = '';
   defaultTiers.forEach(([name, color]) => createTier(name, color));
 }
 
-function shuffleTiers() {
-  if (!board) return;
-  const tiers = [...board.children];
-  for (let i = tiers.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [tiers[i], tiers[j]] = [tiers[j], tiers[i]];
-  }
+function reshuffleToPool() {
+  const allItems = [...document.querySelectorAll('.item')];
+  allItems.forEach((item) => poolGrid.appendChild(item));
 
-  tiers.forEach((tier, index) => {
-    board.appendChild(tier);
-    tier.animate(
+  // shuffle pool order
+  const arr = [...poolGrid.children];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  arr.forEach((item, index) => {
+    poolGrid.appendChild(item);
+    item.animate(
       [
-        { transform: 'translateY(-6px)', opacity: 0.8 },
+        { transform: 'translateY(-8px)', opacity: 0.8 },
         { transform: 'translateY(0)', opacity: 1 }
       ],
-      { duration: 260 + index * 12, easing: 'ease-out' }
+      { duration: 180 + index * 8, easing: 'ease-out' }
     );
   });
 }
 
-function init() {
-  if (!board || !poolGrid || !tierTemplate || !assetPool) {
-    console.warn('Tier List init skipped: required DOM missing.');
-    return;
+addTierBtn.addEventListener('click', () => createTier(`Tier ${board.children.length + 1}`, '#a855f7'));
+reorderBtn.addEventListener('click', reshuffleToPool);
+resetBtn.addEventListener('click', () => {
+  const ok = window.confirm('确认重置到初始状态？会清空当前图片和自定义等级。');
+  if (ok) resetBoard();
+});
+
+contactBtn.addEventListener('click', () => authorModal.showModal());
+closeModalBtn.addEventListener('click', () => authorModal.close());
+authorModal.addEventListener('click', (e) => {
+  if (e.target === authorModal) authorModal.close();
+});
+
+copyWechatBtn.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText('cvsooo');
+    copyWechatBtn.textContent = '已复制';
+    setTimeout(() => {
+      copyWechatBtn.textContent = '复制微信号';
+    }, 1200);
+  } catch {
+    alert('微信号：cvsooo');
+  }
+});
+
+uploadInput.addEventListener('change', (e) => readFiles(e.target.files));
+
+assetPool.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  assetPool.classList.add('drop-active');
+  if (dragData?.item) insertAtPointer(poolGrid, dragData.item, e.clientX);
+});
+
+assetPool.addEventListener('dragleave', () => assetPool.classList.remove('drop-active'));
+assetPool.addEventListener('drop', (e) => {
+  e.preventDefault();
+  assetPool.classList.remove('drop-active');
+
+  // only import files when this is an external file drop, not internal item move
+  if (!dragData && e.dataTransfer.files.length) {
+    readFiles(e.dataTransfer.files);
   }
 
-  addTierBtns.forEach((btn) => {
-    btn.addEventListener('click', () => createTier(`Tier ${board.children.length + 1}`, '#a855f7'));
-  });
+  if (dragData?.item) {
+    poolGrid.appendChild(dragData.item);
+    dragData.item.animate(
+      [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
+      { duration: 180, easing: 'ease-out' }
+    );
+  }
+});
 
-  reorderTiersBtns.forEach((btn) => btn.addEventListener('click', shuffleTiers));
+document.body.addEventListener('dragover', (e) => e.preventDefault());
+document.body.addEventListener('drop', (e) => {
+  const valid = e.target.closest('.tier-dropzone, #asset-pool');
 
-  resetBoardBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const confirmed = window.confirm('确认恢复到初始状态？这会清空当前图片和自定义等级。');
-      if (confirmed) resetToDefault();
-    });
-  });
-
-  contactAuthorBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (authorModal?.showModal) authorModal.showModal();
-    });
-  });
-
-  closeModalBtn?.addEventListener('click', () => authorModal?.close());
-  authorModal?.addEventListener('click', (e) => {
-    if (e.target === authorModal) authorModal.close();
-  });
-
-  copyWechatBtn?.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText('cvsooo');
-      copyWechatBtn.textContent = '已复制';
-      setTimeout(() => {
-        copyWechatBtn.textContent = '复制微信号';
-      }, 1200);
-    } catch {
-      alert('微信号：cvsooo');
-    }
-  });
-
-  uploadInputs.forEach((input) => {
-    input.addEventListener('change', (e) => readFiles(e.target.files));
-  });
-
-  assetPool.addEventListener('dragover', (e) => {
+  if (!valid && dragData?.item) {
     e.preventDefault();
-    assetPool.classList.add('drop-active');
-    if (dragData?.item) insertAtPointer(poolGrid, dragData.item, e.clientX);
-  });
+    dragData.source.appendChild(dragData.item);
+    dragData.item.animate(
+      [
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-5px)' },
+        { transform: 'translateX(5px)' },
+        { transform: 'translateX(0)' }
+      ],
+      { duration: 220, easing: 'ease-out' }
+    );
+  }
 
-  assetPool.addEventListener('dragleave', () => assetPool.classList.remove('drop-active'));
-  assetPool.addEventListener('drop', (e) => {
-    e.preventDefault();
-    assetPool.classList.remove('drop-active');
-    if (e.dataTransfer.files.length) readFiles(e.dataTransfer.files);
-    if (dragData?.item) {
-      dragData.item.animate(
-        [{ transform: 'scale(1.05)' }, { transform: 'scale(1) rotate(0deg)' }],
-        { duration: 180, easing: 'ease-out' }
-      );
-    }
-  });
+  if (!valid && !dragData && e.dataTransfer?.files?.length) {
+    readFiles(e.dataTransfer.files);
+  }
+});
 
-  document.body.addEventListener('dragover', (e) => e.preventDefault());
-  document.body.addEventListener('drop', (e) => {
-    const valid = e.target.closest('.tier-dropzone, #asset-pool');
-    if (!valid && dragData?.item) {
-      e.preventDefault();
-      dragData.source.appendChild(dragData.item);
-      dragData.item.animate(
-        [
-          { transform: 'translateX(0)' },
-          { transform: 'translateX(-5px)' },
-          { transform: 'translateX(5px)' },
-          { transform: 'translateX(0)' }
-        ],
-        { duration: 220, easing: 'ease-out' }
-      );
-    }
-
-    if (!valid && e.dataTransfer?.files?.length) {
-      readFiles(e.dataTransfer.files);
-    }
-  });
-
-  resetToDefault();
-}
-
-init();
+resetBoard();
