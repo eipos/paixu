@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-preview-exe:
@@ -35,3 +35,14 @@ jobs:
         with:
           name: Tier-List-Pro-Portable-preview
           path: release/Tier-List-Pro-Portable.exe
+
+      - name: Publish direct preview release asset
+        uses: ncipollo/release-action@v1
+        with:
+          tag: preview
+          name: Preview Build (No Merge Required)
+          prerelease: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifactErrorsFailBuild: true
+          artifacts: release/Tier-List-Pro-Portable.exe

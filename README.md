@@ -1,40 +1,24 @@
 # Tier List Pro
 
-你不需要代码基础，也不需要处理冲突。  
-你只要做一件事：**下载并双击 EXE**。
+你只要下载 EXE 就行，不需要懂代码。
 
-## 一键下载 EXE（Windows 免安装）
+## 直接下载（推荐先用这个）
 
-- https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
+- 预览版（不需要合并 PR）：
+  https://github.com/eipos/paixu/releases/download/preview/Tier-List-Pro-Portable.exe
 
----
+- 正式版（main 构建成功后）：
+  https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
 
-## 如果下载链接 404（按这个顺序）
+## 怎么保证你能下载到
 
-1. 打开构建页面：
-   - https://github.com/eipos/paixu/actions/workflows/release.yml
-2. 如果状态不是绿色成功，等它构建完成。
-3. 再点上面的 EXE 链接。
+1. 先点这个页面：
+   https://github.com/eipos/paixu/actions/workflows/preview-exe.yml
+2. 点 `Run workflow` 触发一次。
+3. 等到绿色成功后，直接点“预览版 EXE 直链”下载。
 
----
+## 说明
 
-## 你不用解决冲突也能拿 EXE
-
-直接用这个工作流（无需合并 PR）：
-
-- https://github.com/eipos/paixu/actions/workflows/preview-exe.yml
-
-步骤：
-1. 点击 `Run workflow`
-2. 等待成功
-3. 在该次运行里下载 `Tier-List-Pro-Portable-preview` artifact
-4. 解压后就是可运行的 EXE
-
----
-
-## 当前版本说明
-
-- 已隐藏“颜色修改”入口（界面不显示颜色选择器）
-- 保留：新增等级、图片拖拽、重排、重置、联系作者
-
-作者微信：`cvsooo`
+- 你不用再处理冲突也能拿到可运行 EXE。
+- 已隐藏颜色修改入口。
+- 作者微信：`cvsooo`

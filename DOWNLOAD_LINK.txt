@@ -1,5 +1,8 @@
-EXE 直链（免安装）：
+正式版 EXE 直链（main 成功构建后可用）：
 https://github.com/eipos/paixu/releases/latest/download/Tier-List-Pro-Portable.exe
 
-构建状态：
-https://github.com/eipos/paixu/actions/workflows/release.yml
+预览版 EXE 直链（不合并也可用）：
+https://github.com/eipos/paixu/releases/download/preview/Tier-List-Pro-Portable.exe
+
+预览构建状态：
+https://github.com/eipos/paixu/actions/workflows/preview-exe.yml
